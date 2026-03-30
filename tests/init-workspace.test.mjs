@@ -1,0 +1,178 @@
+import assert from 'node:assert/strict';
+import { execFile } from 'node:child_process';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { promisify } from 'node:util';
+import test from 'node:test';
+import { runInitCommand } from '../lib/init-workspace.mjs';
+
+const execFileAsync = promisify(execFile);
+
+async function createGitWorkspace() {
+  const workspaceFolder = await fs.mkdtemp(path.join(os.tmpdir(), 'imperia-cli-init-'));
+  await execFileAsync('git', ['init'], { cwd: workspaceFolder });
+  return workspaceFolder;
+}
+
+async function readJson(targetPath) {
+  return JSON.parse(await fs.readFile(targetPath, 'utf8'));
+}
+
+test('runInitCommand creates config and tasks for an empty workspace', async () => {
+  const workspaceFolder = await createGitWorkspace();
+  const solutionPath = path.join(workspaceFolder, 'Backend', 'Backend.sln');
+  const configPath = path.join(workspaceFolder, '.vscode', 'imperia-cli.config.json');
+  const tasksPath = path.join(workspaceFolder, '.vscode', 'tasks.json');
+
+  await fs.mkdir(path.dirname(solutionPath), { recursive: true });
+  await fs.writeFile(solutionPath, '', 'utf8');
+
+  await runInitCommand([], { cwd: workspaceFolder });
+
+  const config = await readJson(configPath);
+  const tasks = await readJson(tasksPath);
+  const repoKey = path.basename(workspaceFolder);
+
+  assert.equal(
+    config.$schema,
+    'https://raw.githubusercontent.com/imperia-cli/imperia-cli/main/schemas/imperia-cli.config.schema.json',
+  );
+  assert.equal(config.workspace.name, repoKey);
+  assert.deepEqual(config.repositories, [
+    {
+      key: repoKey,
+      root: '${workspaceFolder}',
+      solutionPath: '${workspaceFolder}/Backend/Backend.sln',
+    },
+  ]);
+  assert.deepEqual(config.services, []);
+
+  assert.equal(tasks.$schema, 'vscode://schemas/tasks');
+  assert.equal(tasks.version, '2.0.0');
+  assert.deepEqual(
+    tasks.tasks.map((task) => task.label),
+    [
+      'imperia-cli: prepare',
+      'imperia-cli: git-sync',
+      'imperia-cli: stop-services',
+      'imperia-cli: run',
+      `imperia-cli: rebuild ${repoKey}`,
+    ],
+  );
+  assert.deepEqual(tasks.tasks[0].args, ['prepare', '--config', '${workspaceFolder}/.vscode/imperia-cli.config.json']);
+  assert.equal(tasks.tasks[0].command, 'imp');
+  assert.equal(tasks.tasks[0].options.env.IMPERIA_CLI_VSCODE_TASK, '1');
+});
+
+test('runInitCommand keeps placeholder solutionPath when no solution file is detected', async () => {
+  const workspaceFolder = await createGitWorkspace();
+
+  await runInitCommand([], { cwd: workspaceFolder });
+
+  const config = await readJson(path.join(workspaceFolder, '.vscode', 'imperia-cli.config.json'));
+
+  assert.equal(config.repositories[0].solutionPath, '${workspaceFolder}/path/to/Backend.sln');
+});
+
+test('runInitCommand merges existing config and JSONC tasks without touching manual tasks', async () => {
+  const workspaceFolder = await createGitWorkspace();
+  const configPath = path.join(workspaceFolder, '.vscode', 'imperia-cli.config.json');
+  const tasksPath = path.join(workspaceFolder, '.vscode', 'tasks.json');
+  const repoKey = path.basename(workspaceFolder);
+
+  await fs.mkdir(path.join(workspaceFolder, '.vscode'), { recursive: true });
+  await fs.writeFile(configPath, JSON.stringify({
+    repositories: [
+      {
+        key: 'existing-repo',
+        root: '${workspaceFolder}/../existing-repo',
+        solutionPath: '${workspaceFolder}/../existing-repo/Backend/Existing.sln',
+      },
+    ],
+    services: [
+      {
+        commandName: 'run-existing-service',
+        repoKey: 'existing-repo',
+        command: 'npm.cmd',
+      },
+    ],
+  }, null, 2), 'utf8');
+  await fs.writeFile(tasksPath, `{
+  // user-maintained tasks should remain untouched
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "manual: custom",
+      "type": "shell",
+      "command": "echo",
+      "args": ["keep-me"],
+    },
+    {
+      "label": "imperia-cli: prepare",
+      "type": "shell",
+      "command": "imp",
+      "args": ["prepare"],
+    },
+  ],
+}
+`, 'utf8');
+
+  await runInitCommand([], { cwd: workspaceFolder });
+  await runInitCommand([], { cwd: workspaceFolder });
+
+  const config = await readJson(configPath);
+  const tasks = await readJson(tasksPath);
+
+  assert.equal(
+    config.$schema,
+    'https://raw.githubusercontent.com/imperia-cli/imperia-cli/main/schemas/imperia-cli.config.schema.json',
+  );
+  assert.equal(config.workspace.name, repoKey);
+  assert.deepEqual(
+    config.repositories.map((repository) => repository.key),
+    ['existing-repo', repoKey],
+  );
+  assert.equal(config.services.length, 1);
+
+  assert.equal(tasks.tasks.filter((task) => task.label === 'manual: custom').length, 1);
+  assert.equal(tasks.tasks.filter((task) => task.label === 'imperia-cli: prepare').length, 1);
+  assert.equal(tasks.tasks.filter((task) => task.label === `imperia-cli: rebuild ${repoKey}`).length, 1);
+  assert.equal(tasks.tasks.filter((task) => task.label === 'imperia-cli: rebuild existing-repo').length, 1);
+  assert.equal(tasks.tasks.filter((task) => task.label === 'imperia-cli: run-existing-service').length, 1);
+  assert.equal(tasks.$schema, 'vscode://schemas/tasks');
+  assert.deepEqual(
+    tasks.tasks.find((task) => task.label === 'imperia-cli: run-existing-service').args,
+    ['run-task-service', 'run-existing-service', '--config', '${workspaceFolder}/.vscode/imperia-cli.config.json'],
+  );
+});
+
+test('runInitCommand points custom config paths to the published GitHub schema', async () => {
+  const workspaceFolder = await createGitWorkspace();
+  const customConfigPath = path.join(workspaceFolder, '.config', 'studio.json');
+
+  await runInitCommand(['--config', '.config/studio.json'], { cwd: workspaceFolder });
+
+  const config = await readJson(customConfigPath);
+
+  assert.equal(
+    config.$schema,
+    'https://raw.githubusercontent.com/imperia-cli/imperia-cli/main/schemas/imperia-cli.config.schema.json',
+  );
+});
+
+test('runInitCommand fails on invalid existing config without writing tasks', async () => {
+  const workspaceFolder = await createGitWorkspace();
+  const configPath = path.join(workspaceFolder, '.vscode', 'imperia-cli.config.json');
+  const tasksPath = path.join(workspaceFolder, '.vscode', 'tasks.json');
+
+  await fs.mkdir(path.dirname(configPath), { recursive: true });
+  await fs.writeFile(configPath, '{ invalid json', 'utf8');
+
+  await assert.rejects(
+    runInitCommand([], { cwd: workspaceFolder }),
+    /Unable to merge config file/,
+  );
+
+  await assert.rejects(fs.access(tasksPath));
+});

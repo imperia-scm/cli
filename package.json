@@ -1,0 +1,45 @@
+{
+  "name": "@imperiascm/cli",
+  "version": "1.0.1",
+  "description": "VS Code task orchestrator for local development workspaces.",
+  "homepage": "https://github.com/imperia-cli/imperia-cli#readme",
+  "bugs": {
+    "url": "https://github.com/imperia-cli/imperia-cli/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imperia-cli/imperia-cli.git"
+  },
+  "type": "module",
+  "private": false,
+  "bin": {
+    "imp": "./bin/imp.mjs"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "schemas",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "npm test && changeset publish"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "ora": "^8.2.0",
+    "yoctocolors": "^2.1.1"
+  },
+  "devDependencies": {
+    "@changesets/changelog-github": "^0.6.0",
+    "@changesets/cli": "^2.30.0"
+  }
+}
