@@ -44,6 +44,9 @@ imp init
 Las tareas de VS Code deben invocar el binario global y pasar la configuracion del
 workspace:
 
+`imp init` deja `imperia-cli: run` como tarea `build` por defecto, asi que `Ctrl+Shift+B`
+abre el selector de servicios.
+
 ```json
 {
   "command": "imp",

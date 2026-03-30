@@ -1,5 +1,11 @@
 # @imperiascm/cli
 
+## 1.0.3
+
+### Patch Changes
+
+- Make the generated `imperia-cli: run` VS Code task the default build task so `Ctrl+Shift+B` opens the service selector.
+
 ## 1.0.2
 
 ### Patch Changes
