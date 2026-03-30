@@ -1,5 +1,11 @@
 # @imperiascm/cli
 
+## 2.0.1
+
+### Patch Changes
+
+- Stabilize the `runServiceGroup` output-prefix test in CI so both service processes emit their prefixed readiness lines before shutdown begins.
+
 ## 2.0.0
 
 ### Major Changes

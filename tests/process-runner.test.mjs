@@ -59,14 +59,14 @@ test('runServiceGroup prefixes output with the service command name', async () =
     {
       commandName: 'run-repo-a-web',
       command: process.execPath,
-      args: ['-e', "console.log('web ready')"],
+      args: ['-e', "console.log('web ready'); setTimeout(() => process.exit(0), 50)"],
       cwd: process.cwd(),
       env: {},
     },
     {
       commandName: 'run-repo-b-api',
       command: process.execPath,
-      args: ['-e', "console.log('api ready')"],
+      args: ['-e', "console.log('api ready'); setTimeout(() => process.exit(0), 50)"],
       cwd: process.cwd(),
       env: {},
     },
