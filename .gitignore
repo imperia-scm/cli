@@ -1,6 +1,6 @@
 node_modules/
 coverage/
-.vscode/imperia-cli.config.json
+.vscode/imperiascm-cli.config.json
 .vscode/tasks.json
 .env
 .env.*

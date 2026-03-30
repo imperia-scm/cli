@@ -35,15 +35,15 @@ function runCli(args, { cwd, env = {} } = {}) {
 }
 
 async function createPrepareWorkspace() {
-  const rootFolder = await fs.mkdtemp(path.join(os.tmpdir(), 'imperia-cli-bin-prepare-'));
+  const rootFolder = await fs.mkdtemp(path.join(os.tmpdir(), 'imperiascm-cli-bin-prepare-'));
   const remoteFolder = path.join(rootFolder, 'remote.git');
   const workspaceFolder = path.join(rootFolder, 'workspace');
   const solutionPath = path.join(workspaceFolder, 'Backend', 'Backend.sln');
 
   await execFileAsync('git', ['init', '--bare', remoteFolder]);
   await execFileAsync('git', ['clone', remoteFolder, workspaceFolder]);
-  await execFileAsync('git', ['config', 'user.name', 'imperia-cli'], { cwd: workspaceFolder });
-  await execFileAsync('git', ['config', 'user.email', 'imperia-cli@example.test'], { cwd: workspaceFolder });
+  await execFileAsync('git', ['config', 'user.name', 'imperiascm-cli'], { cwd: workspaceFolder });
+  await execFileAsync('git', ['config', 'user.email', 'imperiascm-cli@example.test'], { cwd: workspaceFolder });
 
   await fs.mkdir(path.dirname(solutionPath), { recursive: true });
   await fs.writeFile(solutionPath, [
@@ -66,7 +66,7 @@ async function createPrepareWorkspace() {
 
 async function createServiceWorkspace() {
   const { workspaceFolder } = await createPrepareWorkspace();
-  const configPath = path.join(workspaceFolder, '.vscode', 'imperia-cli.config.json');
+  const configPath = path.join(workspaceFolder, '.vscode', 'imperiascm-cli.config.json');
   const repoKey = path.basename(workspaceFolder);
 
   await fs.mkdir(path.dirname(configPath), { recursive: true });
@@ -95,13 +95,13 @@ async function createServiceWorkspace() {
 }
 
 test('bin/imp.mjs allows init outside VS Code tasks', async () => {
-  const workspaceFolder = await fs.mkdtemp(path.join(os.tmpdir(), 'imperia-cli-bin-init-'));
+  const workspaceFolder = await fs.mkdtemp(path.join(os.tmpdir(), 'imperiascm-cli-bin-init-'));
   await execFileAsync('git', ['init'], { cwd: workspaceFolder });
 
   const result = await runCli(['init'], { cwd: workspaceFolder });
 
   assert.equal(result.code, 0);
-  await fs.access(path.join(workspaceFolder, '.vscode', 'imperia-cli.config.json'));
+  await fs.access(path.join(workspaceFolder, '.vscode', 'imperiascm-cli.config.json'));
   await fs.access(path.join(workspaceFolder, '.vscode', 'tasks.json'));
 });
 

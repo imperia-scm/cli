@@ -1,16 +1,16 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/imperia-scm/cli/schemas/imperia-cli.config.schema.json",
-  "title": "imperia-cli Workspace Config",
-  "description": "Configuration file consumed by imperia-cli to resolve repositories, local development services and auxiliary runtime state used by VS Code tasks. Path-like string fields may use template variables such as ${workspaceFolder} and ${configDir}.",
+  "$id": "https://github.com/imperia-scm/cli/schemas/imperiascm-cli.config.schema.json",
+  "title": "imperiascm-cli Workspace Config",
+  "description": "Configuration file consumed by imperiascm-cli to resolve repositories, local development services and auxiliary runtime state used by VS Code tasks. Path-like string fields may use template variables such as ${workspaceFolder} and ${configDir}.",
   "type": "object",
   "additionalProperties": true,
   "properties": {
     "$schema": {
       "type": "string",
-      "description": "Schema URI used by editors for validation and IntelliSense. The generated config points to the published imperia-cli schema.",
+      "description": "Schema URI used by editors for validation and IntelliSense. The generated config points to the published imperiascm-cli schema.",
       "examples": [
-        "https://raw.githubusercontent.com/imperia-scm/cli/main/schemas/imperia-cli.config.schema.json"
+        "https://raw.githubusercontent.com/imperia-scm/cli/main/schemas/imperiascm-cli.config.schema.json"
       ]
     },
     "workspace": {
@@ -21,7 +21,7 @@
         "name": {
           "type": "string",
           "minLength": 1,
-          "description": "Display name shown by the CLI UI. If omitted, imperia-cli uses the workspace folder name.",
+          "description": "Display name shown by the CLI UI. If omitted, imperiascm-cli uses the workspace folder name.",
           "examples": [
             "Backend + Frontend"
           ]
@@ -36,9 +36,9 @@
         "runSelectionPath": {
           "type": "string",
           "minLength": 1,
-          "description": "Path where the selected services state is stored between the interactive selector and subsequent service-run tasks. If omitted, imperia-cli uses ${workspaceFolder}/.git/task-state/imperia-cli-run-selection.json.",
+          "description": "Path where the selected services state is stored between the interactive selector and subsequent service-run tasks. If omitted, imperiascm-cli uses ${workspaceFolder}/.git/task-state/imperiascm-cli-run-selection.json.",
           "examples": [
-            "${workspaceFolder}/.git/task-state/imperia-cli-run-selection.json",
+            "${workspaceFolder}/.git/task-state/imperiascm-cli-run-selection.json",
             "${configDir}/task-state/run-selection.json"
           ]
         }
@@ -69,7 +69,7 @@
     },
     "services": {
       "type": "array",
-      "description": "Service commands that imperia-cli can prepare, filter from the interactive selector, and launch through VS Code tasks.",
+      "description": "Service commands that imperiascm-cli can prepare, filter from the interactive selector, and launch through VS Code tasks.",
       "default": [],
       "items": {
         "$ref": "#/$defs/service"
@@ -81,12 +81,12 @@
   ],
   "examples": [
     {
-      "$schema": "https://raw.githubusercontent.com/imperia-scm/cli/main/schemas/imperia-cli.config.schema.json",
+      "$schema": "https://raw.githubusercontent.com/imperia-scm/cli/main/schemas/imperiascm-cli.config.schema.json",
       "workspace": {
         "name": "Imperia Local Workspace"
       },
       "state": {
-        "runSelectionPath": "${workspaceFolder}/.git/task-state/imperia-cli-run-selection.json"
+        "runSelectionPath": "${workspaceFolder}/.git/task-state/imperiascm-cli-run-selection.json"
       },
       "repositoryTasks": {
         "syncMaxConcurrentRepositories": 4,
@@ -157,7 +157,7 @@
     "pathString": {
       "type": "string",
       "minLength": 1,
-      "description": "Absolute path or a template-based path resolved by imperia-cli. Supported template variables are ${workspaceFolder} and ${configDir}.",
+      "description": "Absolute path or a template-based path resolved by imperiascm-cli. Supported template variables are ${workspaceFolder} and ${configDir}.",
       "examples": [
         "${workspaceFolder}",
         "${workspaceFolder}/Frontend",
@@ -189,7 +189,7 @@
         "number",
         "boolean"
       ],
-      "description": "Single command argument. imperia-cli converts all values to strings before spawning the process."
+      "description": "Single command argument. imperiascm-cli converts all values to strings before spawning the process."
     },
     "repository": {
       "type": "object",
@@ -217,7 +217,7 @@
         },
         "root": {
           "$ref": "#/$defs/pathString",
-          "description": "Repository root folder. If a service omits cwd, imperia-cli launches it from this folder."
+          "description": "Repository root folder. If a service omits cwd, imperiascm-cli launches it from this folder."
         },
         "solutionPath": {
           "$ref": "#/$defs/pathString",
@@ -242,7 +242,7 @@
         "buildTaskLabel": {
           "type": "string",
           "minLength": 1,
-          "description": "Label shown when imperia-cli reports repository solution build steps. Defaults to (<key>) build solution.",
+          "description": "Label shown when imperiascm-cli reports repository solution build steps. Defaults to (<key>) build solution.",
           "examples": [
             "(repo-a) build solution"
           ]
@@ -261,7 +261,7 @@
       "properties": {
         "type": {
           "const": "npm-auth",
-          "description": "Special step type handled by imperia-cli."
+          "description": "Special step type handled by imperiascm-cli."
         },
         "label": {
           "type": "string",
@@ -284,7 +284,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "description": "Optional custom type metadata. imperia-cli treats any non 'npm-auth' step with a command as a regular command step.",
+          "description": "Optional custom type metadata. imperiascm-cli treats any non 'npm-auth' step with a command as a regular command step.",
           "examples": [
             "command",
             "install"
@@ -333,7 +333,7 @@
     },
     "service": {
       "type": "object",
-      "description": "Runnable development service exposed to imperia-cli and VS Code tasks.",
+      "description": "Runnable development service exposed to imperiascm-cli and VS Code tasks.",
       "additionalProperties": true,
       "properties": {
         "commandName": {
@@ -380,7 +380,7 @@
         },
         "ports": {
           "type": "array",
-          "description": "Ports managed by the service. imperia-cli uses them to stop conflicting local processes before launch.",
+          "description": "Ports managed by the service. imperiascm-cli uses them to stop conflicting local processes before launch.",
           "default": [],
           "items": {
             "type": "integer",
@@ -434,7 +434,7 @@
         "preflightTitle": {
           "type": "string",
           "minLength": 1,
-          "description": "Custom heading displayed while executing the preflight steps. If omitted, imperia-cli shows 'Preparing <title>.'"
+          "description": "Custom heading displayed while executing the preflight steps. If omitted, imperiascm-cli shows 'Preparing <title>.'"
         },
         "preflight": {
           "type": "array",

@@ -84,7 +84,7 @@ test('run selector maps keypresses and renders instructions', (t) => {
   assert.equal(mapRunKeypressToInput({ name: 'c', ctrl: true }), 'interrupt');
   assert.match(screen, /API \(repo-b, \.NET\)/);
   assert.match(screen, /Web \(repo-a, Web\)/);
-  assert.match(screen, /^imperia-cli$/m);
+  assert.match(screen, /^imperiascm-cli$/m);
   assert.match(screen, /Controls/);
   assert.match(screen, /\[arrows\] \[j\/k\] move/);
   assert.match(screen, /\[space\] toggle focused/);

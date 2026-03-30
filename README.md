@@ -1,4 +1,4 @@
-# `imperia-cli`
+# `imperiascm-cli`
 
 CLI para orquestar servicios locales de desarrollo desde terminal y tareas de VS Code.
 
@@ -35,7 +35,7 @@ con permisos de publicacion sobre `@imperiascm/cli`.
 
 ## Publicacion segura
 
-`imp init` genera `.vscode/imperia-cli.config.json` y `.vscode/tasks.json` como artefactos locales del workspace. En este repo deben tratarse como archivos no versionables.
+`imp init` genera `.vscode/imperiascm-cli.config.json` y `.vscode/tasks.json` como artefactos locales del workspace. En este repo deben tratarse como archivos no versionables.
 
 Antes de abrir un PR o publicar una release:
 
@@ -46,7 +46,7 @@ Antes de abrir un PR o publicar una release:
 
 ## Uso
 
-Inicializa el workspace una vez para generar `.vscode/tasks.json` y `.vscode/imperia-cli.config.json`:
+Inicializa el workspace una vez para generar `.vscode/tasks.json` y `.vscode/imperiascm-cli.config.json`:
 
 ```powershell
 imp init
@@ -64,7 +64,7 @@ imp run-service run-repo-a-web
 Si quieres integracion con VS Code, las tareas generadas invocan el binario global y
 pasan la configuracion del workspace:
 
-`imp init` deja `launch services via imperia-cli` como tarea `build` por defecto, asi que `Ctrl+Shift+B`
+`imp init` deja `launch services via imperiascm-cli` como tarea `build` por defecto, asi que `Ctrl+Shift+B`
 abre el selector de servicios.
 El `tasks.json` generado se limita a las tareas minimas de seleccion, preparacion y lanzamiento.
 
@@ -74,7 +74,7 @@ El `tasks.json` generado se limita a las tareas minimas de seleccion, preparacio
   "args": [
     "select-services-to-launch",
     "--config",
-    "${workspaceFolder}/.vscode/imperia-cli.config.json"
+    "${workspaceFolder}/.vscode/imperiascm-cli.config.json"
   ]
 }
 ```
@@ -82,7 +82,7 @@ El `tasks.json` generado se limita a las tareas minimas de seleccion, preparacio
 La config generada incluye `"$schema"` apuntando al schema publicado en GitHub.
 `tasks.json` usa el schema estandar de VS Code.
 
-Si quieres paralelizar tareas por repositorio, puedes configurarlo en `imperia-cli.config.json`:
+Si quieres paralelizar tareas por repositorio, puedes configurarlo en `imperiascm-cli.config.json`:
 
 ```json
 {

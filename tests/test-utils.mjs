@@ -56,9 +56,9 @@ export function stripAnsi(text) {
 }
 
 export function createTestRuntimeContext(overrides = {}) {
-  const workspaceFolder = overrides.workspaceFolder ?? path.join(os.tmpdir(), 'imperia-cli-workspace');
-  const configPath = overrides.configPath ?? path.join(workspaceFolder, '.vscode', 'imperia-cli.config.json');
-  const runSelectionStatePath = overrides.runSelectionStatePath ?? path.join(workspaceFolder, '.git', 'task-state', 'imperia-cli-run-selection.json');
+  const workspaceFolder = overrides.workspaceFolder ?? path.join(os.tmpdir(), 'imperiascm-cli-workspace');
+  const configPath = overrides.configPath ?? path.join(workspaceFolder, '.vscode', 'imperiascm-cli.config.json');
+  const runSelectionStatePath = overrides.runSelectionStatePath ?? path.join(workspaceFolder, '.git', 'task-state', 'imperiascm-cli-run-selection.json');
   const repositories = overrides.repositories ?? [
     {
       key: 'repo-a',

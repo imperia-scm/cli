@@ -10,7 +10,7 @@ import { runInitCommand } from '../lib/init-workspace.mjs';
 const execFileAsync = promisify(execFile);
 
 async function createGitWorkspace() {
-  const workspaceFolder = await fs.mkdtemp(path.join(os.tmpdir(), 'imperia-cli-init-'));
+  const workspaceFolder = await fs.mkdtemp(path.join(os.tmpdir(), 'imperiascm-cli-init-'));
   await execFileAsync('git', ['init'], { cwd: workspaceFolder });
   return workspaceFolder;
 }
@@ -22,7 +22,7 @@ async function readJson(targetPath) {
 test('runInitCommand creates config and tasks for an empty workspace', async () => {
   const workspaceFolder = await createGitWorkspace();
   const solutionPath = path.join(workspaceFolder, 'Backend', 'Backend.sln');
-  const configPath = path.join(workspaceFolder, '.vscode', 'imperia-cli.config.json');
+  const configPath = path.join(workspaceFolder, '.vscode', 'imperiascm-cli.config.json');
   const tasksPath = path.join(workspaceFolder, '.vscode', 'tasks.json');
 
   await fs.mkdir(path.dirname(solutionPath), { recursive: true });
@@ -36,7 +36,7 @@ test('runInitCommand creates config and tasks for an empty workspace', async () 
 
   assert.equal(
     config.$schema,
-    'https://raw.githubusercontent.com/imperia-scm/cli/main/schemas/imperia-cli.config.schema.json',
+    'https://raw.githubusercontent.com/imperia-scm/cli/main/schemas/imperiascm-cli.config.schema.json',
   );
   assert.equal(config.workspace.name, repoKey);
   assert.deepEqual(config.repositories, [
@@ -53,27 +53,27 @@ test('runInitCommand creates config and tasks for an empty workspace', async () 
   assert.deepEqual(
     tasks.tasks.map((task) => task.label),
     [
-      'select services to launch via imperia-cli',
-      'prepare services to launch via imperia-cli',
-      'launch services via imperia-cli',
+      'select services to launch via imperiascm-cli',
+      'prepare services to launch via imperiascm-cli',
+      'launch services via imperiascm-cli',
     ],
   );
-  assert.deepEqual(tasks.tasks.find((task) => task.label === 'launch services via imperia-cli').group, {
+  assert.deepEqual(tasks.tasks.find((task) => task.label === 'launch services via imperiascm-cli').group, {
     kind: 'build',
     isDefault: true,
   });
-  assert.deepEqual(tasks.tasks.find((task) => task.label === 'launch services via imperia-cli').dependsOn, [
-    'select services to launch via imperia-cli',
-    'prepare services to launch via imperia-cli',
+  assert.deepEqual(tasks.tasks.find((task) => task.label === 'launch services via imperiascm-cli').dependsOn, [
+    'select services to launch via imperiascm-cli',
+    'prepare services to launch via imperiascm-cli',
   ]);
-  assert.equal(tasks.tasks.find((task) => task.label === 'launch services via imperia-cli').dependsOrder, 'sequence');
-  assert.equal(tasks.tasks.find((task) => task.label === 'select services to launch via imperia-cli').presentation.clear, true);
-  assert.equal(tasks.tasks.find((task) => task.label === 'select services to launch via imperia-cli').presentation.focus, true);
-  assert.equal(tasks.tasks.find((task) => task.label === 'select services to launch via imperia-cli').presentation.showReuseMessage, false);
-  assert.equal(tasks.tasks.find((task) => task.label === 'prepare services to launch via imperia-cli').presentation.clear, true);
-  assert.equal(tasks.tasks.find((task) => task.label === 'prepare services to launch via imperia-cli').hide, true);
-  assert.deepEqual(tasks.tasks.find((task) => task.label === 'select services to launch via imperia-cli').args, ['select-services-to-launch', '--config', '${workspaceFolder}/.vscode/imperia-cli.config.json']);
-  assert.equal(tasks.tasks.find((task) => task.label === 'run selected services via imperia-cli'), undefined);
+  assert.equal(tasks.tasks.find((task) => task.label === 'launch services via imperiascm-cli').dependsOrder, 'sequence');
+  assert.equal(tasks.tasks.find((task) => task.label === 'select services to launch via imperiascm-cli').presentation.clear, true);
+  assert.equal(tasks.tasks.find((task) => task.label === 'select services to launch via imperiascm-cli').presentation.focus, true);
+  assert.equal(tasks.tasks.find((task) => task.label === 'select services to launch via imperiascm-cli').presentation.showReuseMessage, false);
+  assert.equal(tasks.tasks.find((task) => task.label === 'prepare services to launch via imperiascm-cli').presentation.clear, true);
+  assert.equal(tasks.tasks.find((task) => task.label === 'prepare services to launch via imperiascm-cli').hide, true);
+  assert.deepEqual(tasks.tasks.find((task) => task.label === 'select services to launch via imperiascm-cli').args, ['select-services-to-launch', '--config', '${workspaceFolder}/.vscode/imperiascm-cli.config.json']);
+  assert.equal(tasks.tasks.find((task) => task.label === 'run selected services via imperiascm-cli'), undefined);
 });
 
 test('runInitCommand keeps placeholder solutionPath when no solution file is detected', async () => {
@@ -81,14 +81,14 @@ test('runInitCommand keeps placeholder solutionPath when no solution file is det
 
   await runInitCommand([], { cwd: workspaceFolder });
 
-  const config = await readJson(path.join(workspaceFolder, '.vscode', 'imperia-cli.config.json'));
+  const config = await readJson(path.join(workspaceFolder, '.vscode', 'imperiascm-cli.config.json'));
 
   assert.equal(config.repositories[0].solutionPath, '${workspaceFolder}/path/to/Backend.sln');
 });
 
 test('runInitCommand merges existing config and JSONC tasks without touching manual tasks', async () => {
   const workspaceFolder = await createGitWorkspace();
-  const configPath = path.join(workspaceFolder, '.vscode', 'imperia-cli.config.json');
+  const configPath = path.join(workspaceFolder, '.vscode', 'imperiascm-cli.config.json');
   const tasksPath = path.join(workspaceFolder, '.vscode', 'tasks.json');
   const repoKey = path.basename(workspaceFolder);
 
@@ -120,7 +120,7 @@ test('runInitCommand merges existing config and JSONC tasks without touching man
       "args": ["keep-me"],
     },
     {
-      "label": "imperia-cli: prepare workspace",
+      "label": "imperiascm-cli: prepare workspace",
       "type": "shell",
       "command": "imp",
       "args": ["prepare-workspace"],
@@ -137,7 +137,7 @@ test('runInitCommand merges existing config and JSONC tasks without touching man
 
   assert.equal(
     config.$schema,
-    'https://raw.githubusercontent.com/imperia-scm/cli/main/schemas/imperia-cli.config.schema.json',
+    'https://raw.githubusercontent.com/imperia-scm/cli/main/schemas/imperiascm-cli.config.schema.json',
   );
   assert.equal(config.workspace.name, repoKey);
   assert.deepEqual(
@@ -150,33 +150,33 @@ test('runInitCommand merges existing config and JSONC tasks without touching man
     tasks.tasks.map((task) => task.label),
     [
       'manual: custom',
-      'select services to launch via imperia-cli',
-      'prepare services to launch via imperia-cli',
-      'run service run-existing-service via imperia-cli',
-      'run selected services via imperia-cli',
-      'launch services via imperia-cli',
+      'select services to launch via imperiascm-cli',
+      'prepare services to launch via imperiascm-cli',
+      'run service run-existing-service via imperiascm-cli',
+      'run selected services via imperiascm-cli',
+      'launch services via imperiascm-cli',
     ],
   );
   assert.equal(tasks.$schema, 'vscode://schemas/tasks');
-  assert.deepEqual(tasks.tasks.find((task) => task.label === 'launch services via imperia-cli').group, {
+  assert.deepEqual(tasks.tasks.find((task) => task.label === 'launch services via imperiascm-cli').group, {
     kind: 'build',
     isDefault: true,
   });
-  assert.deepEqual(tasks.tasks.find((task) => task.label === 'launch services via imperia-cli').dependsOn, [
-    'select services to launch via imperia-cli',
-    'prepare services to launch via imperia-cli',
-    'run selected services via imperia-cli',
+  assert.deepEqual(tasks.tasks.find((task) => task.label === 'launch services via imperiascm-cli').dependsOn, [
+    'select services to launch via imperiascm-cli',
+    'prepare services to launch via imperiascm-cli',
+    'run selected services via imperiascm-cli',
   ]);
-  assert.equal(tasks.tasks.find((task) => task.label === 'select services to launch via imperia-cli').presentation.clear, true);
-  assert.equal(tasks.tasks.find((task) => task.label === 'select services to launch via imperia-cli').presentation.focus, true);
-  assert.equal(tasks.tasks.find((task) => task.label === 'prepare services to launch via imperia-cli').presentation.clear, true);
-  assert.deepEqual(tasks.tasks.find((task) => task.label === 'run selected services via imperia-cli').dependsOn, [
-    'run service run-existing-service via imperia-cli',
+  assert.equal(tasks.tasks.find((task) => task.label === 'select services to launch via imperiascm-cli').presentation.clear, true);
+  assert.equal(tasks.tasks.find((task) => task.label === 'select services to launch via imperiascm-cli').presentation.focus, true);
+  assert.equal(tasks.tasks.find((task) => task.label === 'prepare services to launch via imperiascm-cli').presentation.clear, true);
+  assert.deepEqual(tasks.tasks.find((task) => task.label === 'run selected services via imperiascm-cli').dependsOn, [
+    'run service run-existing-service via imperiascm-cli',
   ]);
-  assert.equal(tasks.tasks.find((task) => task.label === 'run service run-existing-service via imperia-cli').presentation.clear, true);
+  assert.equal(tasks.tasks.find((task) => task.label === 'run service run-existing-service via imperiascm-cli').presentation.clear, true);
   assert.deepEqual(
-    tasks.tasks.find((task) => task.label === 'run service run-existing-service via imperia-cli').args,
-    ['launch-service', 'run-existing-service', '--config', '${workspaceFolder}/.vscode/imperia-cli.config.json'],
+    tasks.tasks.find((task) => task.label === 'run service run-existing-service via imperiascm-cli').args,
+    ['launch-service', 'run-existing-service', '--config', '${workspaceFolder}/.vscode/imperiascm-cli.config.json'],
   );
 });
 
@@ -190,13 +190,13 @@ test('runInitCommand points custom config paths to the published GitHub schema',
 
   assert.equal(
     config.$schema,
-    'https://raw.githubusercontent.com/imperia-scm/cli/main/schemas/imperia-cli.config.schema.json',
+    'https://raw.githubusercontent.com/imperia-scm/cli/main/schemas/imperiascm-cli.config.schema.json',
   );
 });
 
 test('runInitCommand fails on invalid existing config without writing tasks', async () => {
   const workspaceFolder = await createGitWorkspace();
-  const configPath = path.join(workspaceFolder, '.vscode', 'imperia-cli.config.json');
+  const configPath = path.join(workspaceFolder, '.vscode', 'imperiascm-cli.config.json');
   const tasksPath = path.join(workspaceFolder, '.vscode', 'tasks.json');
 
   await fs.mkdir(path.dirname(configPath), { recursive: true });

@@ -5,18 +5,18 @@ import path from 'node:path';
 import test from 'node:test';
 import { clearRuntimeContextForTests, inspectCliOptions, loadRuntimeContextFromArgv } from '../lib/runtime-config.mjs';
 
-test('inspectCliOptions defaults to the imperia-cli workspace config path', () => {
+test('inspectCliOptions defaults to the imperiascm-cli workspace config path', () => {
   const cwd = path.join('C:', 'workspace', 'repo');
   const parsed = inspectCliOptions(['prepare-workspace'], { cwd });
 
   assert.deepEqual(parsed.commandArgv, ['prepare-workspace']);
-  assert.equal(parsed.configPath, path.join(cwd, '.vscode', 'imperia-cli.config.json'));
+  assert.equal(parsed.configPath, path.join(cwd, '.vscode', 'imperiascm-cli.config.json'));
 });
 
 test('loadRuntimeContextFromArgv expands workspace placeholders and service definitions', async (t) => {
-  const workspaceFolder = await fs.mkdtemp(path.join(os.tmpdir(), 'imperia-cli-config-'));
+  const workspaceFolder = await fs.mkdtemp(path.join(os.tmpdir(), 'imperiascm-cli-config-'));
   const configDir = path.join(workspaceFolder, '.vscode');
-  const configPath = path.join(configDir, 'imperia-cli.config.json');
+  const configPath = path.join(configDir, 'imperiascm-cli.config.json');
 
   await fs.mkdir(configDir, { recursive: true });
   await fs.writeFile(configPath, JSON.stringify({
@@ -80,14 +80,14 @@ test('loadRuntimeContextFromArgv expands workspace placeholders and service defi
   assert.equal(context.servicesByCommandName.get('run-repo-a-web').preflight[0].type, 'npm-auth');
   assert.equal(
     context.runSelectionStatePath,
-    path.join(workspaceFolder, '.git', 'task-state', 'imperia-cli-run-selection.json'),
+    path.join(workspaceFolder, '.git', 'task-state', 'imperiascm-cli-run-selection.json'),
   );
 });
 
 test('loadRuntimeContextFromArgv defaults repositoryTasks to sequential execution', async (t) => {
-  const workspaceFolder = await fs.mkdtemp(path.join(os.tmpdir(), 'imperia-cli-config-'));
+  const workspaceFolder = await fs.mkdtemp(path.join(os.tmpdir(), 'imperiascm-cli-config-'));
   const configDir = path.join(workspaceFolder, '.vscode');
-  const configPath = path.join(configDir, 'imperia-cli.config.json');
+  const configPath = path.join(configDir, 'imperiascm-cli.config.json');
 
   await fs.mkdir(configDir, { recursive: true });
   await fs.writeFile(configPath, JSON.stringify({
@@ -114,9 +114,9 @@ test('loadRuntimeContextFromArgv defaults repositoryTasks to sequential executio
 });
 
 test('loadRuntimeContextFromArgv rejects invalid repositoryTasks concurrency values', async (t) => {
-  const workspaceFolder = await fs.mkdtemp(path.join(os.tmpdir(), 'imperia-cli-config-'));
+  const workspaceFolder = await fs.mkdtemp(path.join(os.tmpdir(), 'imperiascm-cli-config-'));
   const configDir = path.join(workspaceFolder, '.vscode');
-  const configPath = path.join(configDir, 'imperia-cli.config.json');
+  const configPath = path.join(configDir, 'imperiascm-cli.config.json');
 
   await fs.mkdir(configDir, { recursive: true });
   await fs.writeFile(configPath, JSON.stringify({
@@ -142,9 +142,9 @@ test('loadRuntimeContextFromArgv rejects invalid repositoryTasks concurrency val
 });
 
 test('loadRuntimeContextFromArgv rejects non-numeric build concurrency values', async (t) => {
-  const workspaceFolder = await fs.mkdtemp(path.join(os.tmpdir(), 'imperia-cli-config-'));
+  const workspaceFolder = await fs.mkdtemp(path.join(os.tmpdir(), 'imperiascm-cli-config-'));
   const configDir = path.join(workspaceFolder, '.vscode');
-  const configPath = path.join(configDir, 'imperia-cli.config.json');
+  const configPath = path.join(configDir, 'imperiascm-cli.config.json');
 
   await fs.mkdir(configDir, { recursive: true });
   await fs.writeFile(configPath, JSON.stringify({

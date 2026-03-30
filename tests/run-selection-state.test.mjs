@@ -15,7 +15,7 @@ import { getServicesByCommandNames } from '../lib/services.mjs';
 import { clearTestRuntimeContext, useTestRuntimeContext } from './test-utils.mjs';
 
 test('run selection state persists and resolves selected services and repos', async (t) => {
-  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'imperia-cli-run-'));
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'imperiascm-cli-run-'));
   const filePath = path.join(tempDir, 'run-selection.json');
   useTestRuntimeContext({ runSelectionStatePath: filePath });
   t.after(clearTestRuntimeContext);
@@ -47,7 +47,7 @@ test('run selection state persists and resolves selected services and repos', as
 });
 
 test('run selection state clears cleanly', async (t) => {
-  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'imperia-cli-run-'));
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'imperiascm-cli-run-'));
   const filePath = path.join(tempDir, 'run-selection.json');
   useTestRuntimeContext({ runSelectionStatePath: filePath });
   t.after(clearTestRuntimeContext);
@@ -71,7 +71,7 @@ test('run selection state clears cleanly', async (t) => {
 });
 
 test('run launch state can be activated and consumed across multiple services', async (t) => {
-  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'imperia-cli-run-'));
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'imperiascm-cli-run-'));
   const filePath = path.join(tempDir, 'run-selection.json');
   useTestRuntimeContext({ runSelectionStatePath: filePath });
   t.after(clearTestRuntimeContext);
@@ -134,7 +134,7 @@ test('run launch state can be activated and consumed across multiple services', 
 });
 
 test('run selection state migrates legacy syncGit and prunes non-selected repo sync state', async (t) => {
-  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'imperia-cli-run-'));
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'imperiascm-cli-run-'));
   const filePath = path.join(tempDir, 'run-selection.json');
   useTestRuntimeContext({ runSelectionStatePath: filePath });
   t.after(clearTestRuntimeContext);

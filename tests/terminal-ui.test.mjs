@@ -17,7 +17,7 @@ test('buildUsageText includes aligned command descriptions', (t) => {
   const usageText = stripAnsi(buildUsageText(createCommandRegistry().commandDefinitions));
 
   assert.match(usageText, /^=+/m);
-  assert.match(usageText, /^imperia-cli$/m);
+  assert.match(usageText, /^imperiascm-cli$/m);
   assert.match(usageText, /Workspace orchestration for local development services/);
   assert.match(usageText, /Quick Start/);
   assert.match(usageText, /imp init/);
