@@ -1,5 +1,11 @@
 # @imperiascm/cli
 
+## 1.0.2
+
+### Patch Changes
+
+- Align GitHub repository metadata and generated schema URLs with the `imperia-scm/cli` repository.
+
 ## 1.0.1
 
 ### Patch Changes

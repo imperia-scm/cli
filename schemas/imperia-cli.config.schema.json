@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/imperia-cli/imperia-cli/schemas/imperia-cli.config.schema.json",
+  "$id": "https://github.com/imperia-scm/cli/schemas/imperia-cli.config.schema.json",
   "title": "imperia-cli Workspace Config",
   "type": "object",
   "additionalProperties": true,

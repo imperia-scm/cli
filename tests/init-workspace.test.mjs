@@ -36,7 +36,7 @@ test('runInitCommand creates config and tasks for an empty workspace', async () 
 
   assert.equal(
     config.$schema,
-    'https://raw.githubusercontent.com/imperia-cli/imperia-cli/main/schemas/imperia-cli.config.schema.json',
+    'https://raw.githubusercontent.com/imperia-scm/cli/main/schemas/imperia-cli.config.schema.json',
   );
   assert.equal(config.workspace.name, repoKey);
   assert.deepEqual(config.repositories, [
@@ -126,7 +126,7 @@ test('runInitCommand merges existing config and JSONC tasks without touching man
 
   assert.equal(
     config.$schema,
-    'https://raw.githubusercontent.com/imperia-cli/imperia-cli/main/schemas/imperia-cli.config.schema.json',
+    'https://raw.githubusercontent.com/imperia-scm/cli/main/schemas/imperia-cli.config.schema.json',
   );
   assert.equal(config.workspace.name, repoKey);
   assert.deepEqual(
@@ -157,7 +157,7 @@ test('runInitCommand points custom config paths to the published GitHub schema',
 
   assert.equal(
     config.$schema,
-    'https://raw.githubusercontent.com/imperia-cli/imperia-cli/main/schemas/imperia-cli.config.schema.json',
+    'https://raw.githubusercontent.com/imperia-scm/cli/main/schemas/imperia-cli.config.schema.json',
   );
 });
 
