@@ -1,2 +1,8 @@
 node_modules/
 coverage/
+.vscode/imperia-cli.config.json
+.vscode/tasks.json
+.env
+.env.*
+!.env.example
+.npmrc

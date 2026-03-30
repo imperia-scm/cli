@@ -33,6 +33,17 @@ npm run release
 Antes de publicar desde GitHub Actions, configura el secreto `NPM_TOKEN` en el repositorio
 con permisos de publicacion sobre `@imperiascm/cli`.
 
+## Publicacion segura
+
+`imp init` genera `.vscode/imperia-cli.config.json` y `.vscode/tasks.json` como artefactos locales del workspace. En este repo deben tratarse como archivos no versionables.
+
+Antes de abrir un PR o publicar una release:
+
+1. Revisa `git status` y los archivos staged para detectar fugas accidentales.
+2. No subas rutas reales del workspace, nombres internos de repositorio, puertos reales ni valores de `services[].env`.
+3. Manten los tokens de npm fuera del repo. El flujo soportado usa el `.npmrc` del perfil de usuario, no uno versionado en el proyecto.
+4. Si necesitas ejemplos de configuracion local, usa placeholders o archivos como `.env.example`, nunca credenciales ni valores reales.
+
 ## Uso
 
 Inicializa el workspace una vez para generar `.vscode/tasks.json` y `.vscode/imperia-cli.config.json`:
