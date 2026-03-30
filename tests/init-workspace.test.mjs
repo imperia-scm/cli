@@ -53,20 +53,27 @@ test('runInitCommand creates config and tasks for an empty workspace', async () 
   assert.deepEqual(
     tasks.tasks.map((task) => task.label),
     [
-      'imperia-cli: prepare',
-      'imperia-cli: git-sync',
-      'imperia-cli: stop-services',
-      'imperia-cli: run',
-      `imperia-cli: rebuild ${repoKey}`,
+      'select services to launch via imperia-cli',
+      'prepare services to launch via imperia-cli',
+      'launch services via imperia-cli',
     ],
   );
-  assert.deepEqual(tasks.tasks[0].args, ['prepare', '--config', '${workspaceFolder}/.vscode/imperia-cli.config.json']);
-  assert.equal(tasks.tasks[0].command, 'imp');
-  assert.equal(tasks.tasks[0].options.env.IMPERIA_CLI_VSCODE_TASK, '1');
-  assert.deepEqual(tasks.tasks.find((task) => task.label === 'imperia-cli: run').group, {
+  assert.deepEqual(tasks.tasks.find((task) => task.label === 'launch services via imperia-cli').group, {
     kind: 'build',
     isDefault: true,
   });
+  assert.deepEqual(tasks.tasks.find((task) => task.label === 'launch services via imperia-cli').dependsOn, [
+    'select services to launch via imperia-cli',
+    'prepare services to launch via imperia-cli',
+  ]);
+  assert.equal(tasks.tasks.find((task) => task.label === 'launch services via imperia-cli').dependsOrder, 'sequence');
+  assert.equal(tasks.tasks.find((task) => task.label === 'select services to launch via imperia-cli').presentation.clear, true);
+  assert.equal(tasks.tasks.find((task) => task.label === 'select services to launch via imperia-cli').presentation.focus, true);
+  assert.equal(tasks.tasks.find((task) => task.label === 'select services to launch via imperia-cli').presentation.showReuseMessage, false);
+  assert.equal(tasks.tasks.find((task) => task.label === 'prepare services to launch via imperia-cli').presentation.clear, true);
+  assert.equal(tasks.tasks.find((task) => task.label === 'prepare services to launch via imperia-cli').hide, true);
+  assert.deepEqual(tasks.tasks.find((task) => task.label === 'select services to launch via imperia-cli').args, ['select-services-to-launch', '--config', '${workspaceFolder}/.vscode/imperia-cli.config.json']);
+  assert.equal(tasks.tasks.find((task) => task.label === 'run selected services via imperia-cli'), undefined);
 });
 
 test('runInitCommand keeps placeholder solutionPath when no solution file is detected', async () => {
@@ -113,10 +120,10 @@ test('runInitCommand merges existing config and JSONC tasks without touching man
       "args": ["keep-me"],
     },
     {
-      "label": "imperia-cli: prepare",
+      "label": "imperia-cli: prepare workspace",
       "type": "shell",
       "command": "imp",
-      "args": ["prepare"],
+      "args": ["prepare-workspace"],
     },
   ],
 }
@@ -139,19 +146,37 @@ test('runInitCommand merges existing config and JSONC tasks without touching man
   );
   assert.equal(config.services.length, 1);
 
-  assert.equal(tasks.tasks.filter((task) => task.label === 'manual: custom').length, 1);
-  assert.equal(tasks.tasks.filter((task) => task.label === 'imperia-cli: prepare').length, 1);
-  assert.equal(tasks.tasks.filter((task) => task.label === `imperia-cli: rebuild ${repoKey}`).length, 1);
-  assert.equal(tasks.tasks.filter((task) => task.label === 'imperia-cli: rebuild existing-repo').length, 1);
-  assert.equal(tasks.tasks.filter((task) => task.label === 'imperia-cli: run-existing-service').length, 1);
+  assert.deepEqual(
+    tasks.tasks.map((task) => task.label),
+    [
+      'manual: custom',
+      'select services to launch via imperia-cli',
+      'prepare services to launch via imperia-cli',
+      'run service run-existing-service via imperia-cli',
+      'run selected services via imperia-cli',
+      'launch services via imperia-cli',
+    ],
+  );
   assert.equal(tasks.$schema, 'vscode://schemas/tasks');
-  assert.deepEqual(tasks.tasks.find((task) => task.label === 'imperia-cli: run').group, {
+  assert.deepEqual(tasks.tasks.find((task) => task.label === 'launch services via imperia-cli').group, {
     kind: 'build',
     isDefault: true,
   });
+  assert.deepEqual(tasks.tasks.find((task) => task.label === 'launch services via imperia-cli').dependsOn, [
+    'select services to launch via imperia-cli',
+    'prepare services to launch via imperia-cli',
+    'run selected services via imperia-cli',
+  ]);
+  assert.equal(tasks.tasks.find((task) => task.label === 'select services to launch via imperia-cli').presentation.clear, true);
+  assert.equal(tasks.tasks.find((task) => task.label === 'select services to launch via imperia-cli').presentation.focus, true);
+  assert.equal(tasks.tasks.find((task) => task.label === 'prepare services to launch via imperia-cli').presentation.clear, true);
+  assert.deepEqual(tasks.tasks.find((task) => task.label === 'run selected services via imperia-cli').dependsOn, [
+    'run service run-existing-service via imperia-cli',
+  ]);
+  assert.equal(tasks.tasks.find((task) => task.label === 'run service run-existing-service via imperia-cli').presentation.clear, true);
   assert.deepEqual(
-    tasks.tasks.find((task) => task.label === 'imperia-cli: run-existing-service').args,
-    ['run-task-service', 'run-existing-service', '--config', '${workspaceFolder}/.vscode/imperia-cli.config.json'],
+    tasks.tasks.find((task) => task.label === 'run service run-existing-service via imperia-cli').args,
+    ['launch-service', 'run-existing-service', '--config', '${workspaceFolder}/.vscode/imperia-cli.config.json'],
   );
 });
 

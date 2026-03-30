@@ -2,36 +2,66 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/imperia-scm/cli/schemas/imperia-cli.config.schema.json",
   "title": "imperia-cli Workspace Config",
+  "description": "Configuration file consumed by imperia-cli to resolve repositories, local development services and auxiliary runtime state used by VS Code tasks. Path-like string fields may use template variables such as ${workspaceFolder} and ${configDir}.",
   "type": "object",
   "additionalProperties": true,
   "properties": {
     "$schema": {
-      "type": "string"
+      "type": "string",
+      "description": "Schema URI used by editors for validation and IntelliSense. The generated config points to the published imperia-cli schema.",
+      "examples": [
+        "https://raw.githubusercontent.com/imperia-scm/cli/main/schemas/imperia-cli.config.schema.json"
+      ]
     },
     "workspace": {
       "type": "object",
+      "description": "Optional metadata about the current VS Code workspace.",
       "additionalProperties": true,
       "properties": {
         "name": {
           "type": "string",
           "minLength": 1,
-          "description": "Display name for the workspace in the CLI UI."
+          "description": "Display name shown by the CLI UI. If omitted, imperia-cli uses the workspace folder name.",
+          "examples": [
+            "Backend + Frontend"
+          ]
         }
       }
     },
     "state": {
       "type": "object",
+      "description": "Optional paths for internal CLI state persisted between VS Code tasks.",
       "additionalProperties": true,
       "properties": {
         "runSelectionPath": {
           "type": "string",
           "minLength": 1,
-          "description": "Optional path where the run selection state is persisted."
+          "description": "Path where the selected services state is stored between the interactive selector and subsequent service-run tasks. If omitted, imperia-cli uses ${workspaceFolder}/.git/task-state/imperia-cli-run-selection.json.",
+          "examples": [
+            "${workspaceFolder}/.git/task-state/imperia-cli-run-selection.json",
+            "${configDir}/task-state/run-selection.json"
+          ]
+        }
+      }
+    },
+    "repositoryTasks": {
+      "type": "object",
+      "description": "Optional concurrency limits for repository synchronization and backend solution builds.",
+      "additionalProperties": true,
+      "properties": {
+        "syncMaxConcurrentRepositories": {
+          "$ref": "#/$defs/positiveInteger",
+          "description": "Maximum number of repositories synchronized at the same time. Defaults to 1."
+        },
+        "buildMaxConcurrentRepositories": {
+          "$ref": "#/$defs/positiveInteger",
+          "description": "Maximum number of repositories whose backend solutions are built at the same time. Defaults to 1."
         }
       }
     },
     "repositories": {
       "type": "array",
+      "description": "Repositories available in the workspace. At least one repository is required.",
       "minItems": 1,
       "items": {
         "$ref": "#/$defs/repository"
@@ -39,6 +69,8 @@
     },
     "services": {
       "type": "array",
+      "description": "Service commands that imperia-cli can prepare, filter from the interactive selector, and launch through VS Code tasks.",
+      "default": [],
       "items": {
         "$ref": "#/$defs/service"
       }
@@ -47,50 +79,173 @@
   "required": [
     "repositories"
   ],
+  "examples": [
+    {
+      "$schema": "https://raw.githubusercontent.com/imperia-scm/cli/main/schemas/imperia-cli.config.schema.json",
+      "workspace": {
+        "name": "Imperia Local Workspace"
+      },
+      "state": {
+        "runSelectionPath": "${workspaceFolder}/.git/task-state/imperia-cli-run-selection.json"
+      },
+      "repositoryTasks": {
+        "syncMaxConcurrentRepositories": 4,
+        "buildMaxConcurrentRepositories": 2
+      },
+      "repositories": [
+        {
+          "key": "repo-a",
+          "label": "Repo A",
+          "root": "${workspaceFolder}",
+          "solutionPath": "${workspaceFolder}/Backend/Backend.sln",
+          "buildTaskLabel": "(repo-a) build solution"
+        },
+        {
+          "key": "repo-b",
+          "label": "Repo B",
+          "root": "${workspaceFolder}/../repo-b",
+          "solutionPath": "${workspaceFolder}/../repo-b/Backend/Backend.sln",
+          "existenceLabel": "repo-b repository"
+        }
+      ],
+      "services": [
+        {
+          "commandName": "run-repo-a-web",
+          "title": "Web",
+          "description": "Run the repo-a frontend",
+          "repoKey": "repo-a",
+          "runtime": "Web",
+          "ports": [
+            46111
+          ],
+          "cwd": "${workspaceFolder}/Frontend",
+          "env": {
+            "NODE_ENV": "development"
+          },
+          "command": "npm.cmd",
+          "args": [
+            "start"
+          ],
+          "preflightTitle": "Preparing Web.",
+          "preflight": [
+            {
+              "type": "npm-auth"
+            },
+            {
+              "label": "Install frontend dependencies",
+              "command": "npm.cmd",
+              "args": [
+                "install"
+              ],
+              "cwd": "${workspaceFolder}/Frontend"
+            }
+          ]
+        }
+      ]
+    }
+  ],
   "$defs": {
+    "positiveInteger": {
+      "type": "integer",
+      "minimum": 1,
+      "examples": [
+        1,
+        2,
+        4
+      ]
+    },
+    "pathString": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Absolute path or a template-based path resolved by imperia-cli. Supported template variables are ${workspaceFolder} and ${configDir}.",
+      "examples": [
+        "${workspaceFolder}",
+        "${workspaceFolder}/Frontend",
+        "${configDir}/task-state/run-selection.json",
+        "C:/src/project/Backend/Backend.sln"
+      ]
+    },
     "stringRecord": {
       "type": "object",
+      "description": "String-keyed map used for environment variables. Non-string primitive values are accepted and converted to strings at runtime.",
       "additionalProperties": {
         "type": [
           "string",
           "number",
           "boolean"
         ]
-      }
+      },
+      "examples": [
+        {
+          "ASPNETCORE_ENVIRONMENT": "Development",
+          "PORT": 46111,
+          "HTTPS": true
+        }
+      ]
+    },
+    "cliArg": {
+      "type": [
+        "string",
+        "number",
+        "boolean"
+      ],
+      "description": "Single command argument. imperia-cli converts all values to strings before spawning the process."
     },
     "repository": {
       "type": "object",
+      "description": "Repository definition used for repository synchronization, backend solution builds, and service path resolution.",
       "additionalProperties": true,
       "properties": {
         "key": {
           "type": "string",
           "minLength": 1,
-          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+          "description": "Stable repository identifier referenced by services. Must be unique inside the config.",
+          "examples": [
+            "repo-a",
+            "backend",
+            "platform_api"
+          ]
         },
         "label": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Human-friendly repository name used in progress logs and the interactive selector. Defaults to key.",
+          "examples": [
+            "Repo A"
+          ]
         },
         "root": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Absolute path or template path such as ${workspaceFolder}/repo."
+          "$ref": "#/$defs/pathString",
+          "description": "Repository root folder. If a service omits cwd, imperia-cli launches it from this folder."
         },
         "solutionPath": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Absolute path or template path to the .sln file."
+          "$ref": "#/$defs/pathString",
+          "description": "Path to the .sln file rebuilt by repository preparation tasks."
         },
         "existenceLabel": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional label used in missing-path errors instead of the generic repository name.",
+          "examples": [
+            "repo-b repository"
+          ]
         },
         "buildStateFileName": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Name of the file used to track backend build state for this repository. Defaults to <key>-build.state.",
+          "examples": [
+            "repo-a-build.state"
+          ]
         },
         "buildTaskLabel": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Label shown when imperia-cli reports repository solution build steps. Defaults to (<key>) build solution.",
+          "examples": [
+            "(repo-a) build solution"
+          ]
         }
       },
       "required": [
@@ -101,18 +256,21 @@
     },
     "preflightNpmAuth": {
       "type": "object",
+      "description": "Preflight step that validates npm authentication before running an npm-based service.",
       "additionalProperties": true,
       "properties": {
         "type": {
-          "const": "npm-auth"
+          "const": "npm-auth",
+          "description": "Special step type handled by imperia-cli."
         },
         "label": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Custom label shown while validating npm authentication. Defaults to 'Validate npm authentication'."
         },
         "cwd": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/pathString",
+          "description": "Working directory used to validate npm authentication. Defaults to the parent service cwd."
         }
       },
       "required": [
@@ -121,39 +279,52 @@
     },
     "preflightCommand": {
       "type": "object",
+      "description": "Generic preflight command executed before the service starts. Any step with a command is normalized as a command preflight step.",
       "additionalProperties": true,
       "properties": {
         "type": {
-          "type": "string"
+          "type": "string",
+          "description": "Optional custom type metadata. imperia-cli treats any non 'npm-auth' step with a command as a regular command step.",
+          "examples": [
+            "command",
+            "install"
+          ]
         },
         "label": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Label shown in progress output. Defaults to description and then command."
         },
         "description": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Fallback text used to derive the displayed label when label is omitted."
         },
         "command": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Executable used for the preflight step.",
+          "examples": [
+            "npm.cmd",
+            "dotnet",
+            "powershell"
+          ]
         },
         "args": {
           "type": "array",
+          "description": "Arguments passed to the preflight command. Values are stringified at runtime.",
+          "default": [],
           "items": {
-            "type": [
-              "string",
-              "number",
-              "boolean"
-            ]
+            "$ref": "#/$defs/cliArg"
           }
         },
         "cwd": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/pathString",
+          "description": "Working directory for the preflight command. Defaults to the parent service cwd."
         },
         "env": {
-          "$ref": "#/$defs/stringRecord"
+          "$ref": "#/$defs/stringRecord",
+          "description": "Extra environment variables merged into the spawned preflight process."
         }
       },
       "required": [
@@ -162,63 +333,113 @@
     },
     "service": {
       "type": "object",
+      "description": "Runnable development service exposed to imperia-cli and VS Code tasks.",
       "additionalProperties": true,
       "properties": {
         "commandName": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+          "description": "Stable service identifier used for task generation, persisted selection state and CLI dispatch.",
+          "examples": [
+            "run-repo-a-web",
+            "run-api"
+          ]
         },
         "description": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Longer text shown in command listings. Defaults to commandName.",
+          "examples": [
+            "Run the repo-a web app"
+          ]
         },
         "title": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Short label shown in the interactive service selector. Defaults to commandName.",
+          "examples": [
+            "Web",
+            "API"
+          ]
         },
         "repoKey": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Repository key that owns this service. Must match one of the entries in repositories[].key."
         },
         "runtime": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Optional runtime badge shown in the selector and metadata output.",
+          "examples": [
+            ".NET",
+            "Web",
+            "Node"
+          ]
         },
         "ports": {
           "type": "array",
+          "description": "Ports managed by the service. imperia-cli uses them to stop conflicting local processes before launch.",
+          "default": [],
           "items": {
             "type": "integer",
             "minimum": 1,
             "maximum": 65535
-          }
+          },
+          "examples": [
+            [
+              46100
+            ],
+            [
+              46110,
+              46111
+            ]
+          ]
         },
         "cwd": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/pathString",
+          "description": "Working directory used to start the service. Defaults to the root of the referenced repository."
         },
         "env": {
-          "$ref": "#/$defs/stringRecord"
+          "$ref": "#/$defs/stringRecord",
+          "description": "Extra environment variables merged into the service process."
         },
         "command": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Executable used to start the service.",
+          "examples": [
+            "dotnet",
+            "npm.cmd",
+            "pnpm.cmd"
+          ]
         },
         "args": {
           "type": "array",
+          "description": "Arguments passed to the service command. Values are stringified at runtime.",
+          "default": [],
           "items": {
-            "type": [
-              "string",
-              "number",
-              "boolean"
+            "$ref": "#/$defs/cliArg"
+          },
+          "examples": [
+            [
+              "run"
+            ],
+            [
+              "start"
             ]
-          }
+          ]
         },
         "preflightTitle": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Custom heading displayed while executing the preflight steps. If omitted, imperia-cli shows 'Preparing <title>.'"
         },
         "preflight": {
           "type": "array",
+          "description": "Ordered preflight steps executed before the service starts.",
+          "default": [],
           "items": {
             "oneOf": [
               {

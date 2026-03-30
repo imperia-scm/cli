@@ -1,6 +1,6 @@
 # `imperia-cli`
 
-CLI para orquestar servicios locales de desarrollo desde tareas de VS Code.
+CLI para orquestar servicios locales de desarrollo desde terminal y tareas de VS Code.
 
 ## Instalacion
 
@@ -41,33 +41,50 @@ Inicializa el workspace una vez para generar `.vscode/tasks.json` y `.vscode/imp
 imp init
 ```
 
-Las tareas de VS Code deben invocar el binario global y pasar la configuracion del
-workspace:
+Despues puedes usar el CLI directamente desde terminal:
 
-`imp init` deja `imperia-cli: run` como tarea `build` por defecto, asi que `Ctrl+Shift+B`
+```powershell
+imp launch-services
+imp prepare-workspace
+imp stop-services
+imp run-service run-repo-a-web
+```
+
+Si quieres integracion con VS Code, las tareas generadas invocan el binario global y
+pasan la configuracion del workspace:
+
+`imp init` deja `launch services via imperia-cli` como tarea `build` por defecto, asi que `Ctrl+Shift+B`
 abre el selector de servicios.
+El `tasks.json` generado se limita a las tareas minimas de seleccion, preparacion y lanzamiento.
 
 ```json
 {
   "command": "imp",
   "args": [
-    "prepare",
+    "select-services-to-launch",
     "--config",
     "${workspaceFolder}/.vscode/imperia-cli.config.json"
-  ],
-  "options": {
-    "env": {
-      "IMPERIA_CLI_VSCODE_TASK": "1"
-    }
-  }
+  ]
 }
 ```
 
 La config generada incluye `"$schema"` apuntando al schema publicado en GitHub.
 `tasks.json` usa el schema estandar de VS Code.
 
+Si quieres paralelizar tareas por repositorio, puedes configurarlo en `imperia-cli.config.json`:
+
+```json
+{
+  "repositoryTasks": {
+    "syncMaxConcurrentRepositories": 4,
+    "buildMaxConcurrentRepositories": 2
+  }
+}
+```
+
+Ambos valores son opcionales y por defecto valen `1`, asi que el comportamiento existente sigue siendo secuencial.
+
 ## Restricciones v1
 
-- Solo soportado desde tareas de VS Code.
 - Windows y PowerShell first.
 - Sin soporte para `wt.exe` ni multiplexacion externa.

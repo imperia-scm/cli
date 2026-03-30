@@ -67,7 +67,7 @@ export function createTestRuntimeContext(overrides = {}) {
       existenceLabel: null,
       buildStateFileName: 'repo-a-build.state',
       solutionPath: path.join(workspaceFolder, 'Backend', 'Backend.sln'),
-      buildTaskLabel: '(repo-a) rebuild',
+      buildTaskLabel: '(repo-a) build solution',
     },
     {
       key: 'repo-b',
@@ -76,7 +76,7 @@ export function createTestRuntimeContext(overrides = {}) {
       existenceLabel: 'repo-b repository',
       buildStateFileName: 'repo-b-build.state',
       solutionPath: path.join(workspaceFolder, '..', 'repo-b', 'Backend', 'Backend.sln'),
-      buildTaskLabel: '(repo-b) rebuild',
+      buildTaskLabel: '(repo-b) build solution',
     },
   ];
   const repositoriesByKey = new Map(repositories.map((repository) => [repository.key, repository]));
@@ -157,6 +157,10 @@ export function createTestRuntimeContext(overrides = {}) {
     configPath,
     workspaceFolder,
     workspaceName: overrides.workspaceName ?? 'test-workspace',
+    repositoryTasks: overrides.repositoryTasks ?? {
+      syncMaxConcurrentRepositories: 1,
+      buildMaxConcurrentRepositories: 1,
+    },
     repositories,
     repositoriesByKey,
     services,

@@ -65,7 +65,7 @@ test('run selector exposes confirm and cancel actions', (t) => {
   const invalidConfirmResult = applyRunSelectionInput(state, 'confirm');
 
   assert.equal(invalidConfirmResult.action, null);
-  assert.equal(invalidConfirmResult.state.validationMessage, 'No services selected. Select at least one service before running.');
+  assert.equal(invalidConfirmResult.state.validationMessage, 'No services selected. Select at least one service before launching.');
   assert.equal(applyRunSelectionInput(selectedState, 'confirm').action, 'confirm');
   assert.equal(applyRunSelectionInput(state, 'cancel').action, 'cancel');
 });
@@ -90,9 +90,9 @@ test('run selector maps keypresses and renders instructions', (t) => {
   assert.match(screen, /\[space\] toggle focused/);
   assert.match(screen, /\[a\] all services/);
   assert.match(screen, /\[g\] visible sync repos/);
-  assert.match(screen, /\[enter\] run/);
+  assert.match(screen, /\[enter\] launch/);
   assert.match(screen, /\[esc\] \[q\] cancel/);
-  assert.match(screen, /Services \(select the services to launch with VS Code tasks\)/);
+  assert.match(screen, /Services \(select the services to launch\)/);
   assert.match(screen, /Synchronization \(get latest changes from fetch origin, then pull --ff-only --autostash if there are changes\)/);
   assert.match(screen, /Selection/);
   assert.match(screen, /All repositories/);
@@ -123,7 +123,7 @@ test('run selector renders and clears validation message for empty confirm', (t)
 
   const errorScreen = stripAnsi(renderRunSelectionScreen(state));
 
-  assert.match(errorScreen, /No services selected\. Select at least one service before running\./);
+  assert.match(errorScreen, /No services selected\. Select at least one service before launching\./);
 
   state = applyRunSelectionInput(state, 'down').state;
 

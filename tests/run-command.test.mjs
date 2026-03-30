@@ -4,12 +4,12 @@ import { runInteractiveCommand } from '../lib/run-command.mjs';
 import { getServicesByCommandNames } from '../lib/services.mjs';
 import { clearTestRuntimeContext, useTestRuntimeContext } from './test-utils.mjs';
 
-test('runInteractiveCommand stores the selected services for later VS Code tasks', async (t) => {
+test('runInteractiveCommand stores the selected services for later launch tasks', async (t) => {
   useTestRuntimeContext();
   t.after(clearTestRuntimeContext);
   const persistedSelections = [];
 
-  await runInteractiveCommand({
+  const selection = await runInteractiveCommand({
     presentSelection: async () => ({
       cancelled: false,
       syncGit: true,
@@ -27,6 +27,7 @@ test('runInteractiveCommand stores the selected services for later VS Code tasks
     },
   });
 
+  assert.equal(selection?.cancelled, false);
   assert.equal(persistedSelections.length, 1);
   assert.equal(persistedSelections[0].syncGit, true);
   assert.deepEqual(persistedSelections[0].syncGitRepoKeys, ['repo-b', 'repo-a']);
@@ -41,7 +42,7 @@ test('runInteractiveCommand clears persisted selection when the prompt is cancel
   t.after(clearTestRuntimeContext);
   let cleared = 0;
 
-  await runInteractiveCommand({
+  const selection = await runInteractiveCommand({
     presentSelection: async () => ({
       cancelled: true,
       syncGit: false,
@@ -56,6 +57,7 @@ test('runInteractiveCommand clears persisted selection when the prompt is cancel
     },
   });
 
+  assert.equal(selection, null);
   assert.equal(cleared, 1);
 });
 

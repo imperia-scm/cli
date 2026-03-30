@@ -1,6 +1,6 @@
 {
   "name": "@imperiascm/cli",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "description": "VS Code task orchestrator for local development workspaces.",
   "homepage": "https://github.com/imperia-scm/cli#readme",
   "bugs": {

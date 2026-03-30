@@ -14,14 +14,27 @@ import { clearTestRuntimeContext, captureProcessOutput, stripAnsi, useTestRuntim
 test('buildUsageText includes aligned command descriptions', (t) => {
   useTestRuntimeContext();
   t.after(clearTestRuntimeContext);
-  const usageText = buildUsageText(createCommandRegistry().commandDefinitions);
+  const usageText = stripAnsi(buildUsageText(createCommandRegistry().commandDefinitions));
 
-  assert.match(usageText, /Run this workflow from VS Code tasks/);
+  assert.match(usageText, /^=+/m);
+  assert.match(usageText, /^imperia-cli$/m);
+  assert.match(usageText, /Workspace orchestration for local development services/);
+  assert.match(usageText, /Quick Start/);
   assert.match(usageText, /imp init/);
+  assert.match(usageText, /imp launch-services/);
+  assert.match(usageText, /imp run-service <service>/);
   assert.match(usageText, /init/);
-  assert.match(usageText, /git-sync/);
-  assert.match(usageText, /prepare/);
+  assert.match(usageText, /sync-repository/);
+  assert.match(usageText, /launch-services/);
+  assert.match(usageText, /run-service/);
+  assert.match(usageText, /prepare-workspace/);
+  assert.match(usageText, /build-solution/);
+  assert.doesNotMatch(usageText, /select-services-to-launch/);
+  assert.doesNotMatch(usageText, /prepare-services-to-launch/);
+  assert.doesNotMatch(usageText, /\blaunch-service\b/);
+  assert.doesNotMatch(usageText, /run-service-exec/);
   assert.doesNotMatch(usageText, /refresh-all/);
+  assert.doesNotMatch(usageText, /\brebuild\b/);
 });
 
 test('formatStatusBadge uses the homogeneous badge map', () => {
@@ -43,7 +56,7 @@ test('formatStatusBadge uses the homogeneous badge map', () => {
 
 test('finishSession uses the same badge style as regular status lines', async () => {
   const { stdout } = await captureProcessOutput(async () => {
-    startSession('prepare');
+    startSession('prepare-workspace');
     recordStatus('OK');
     recordStatus('SKIP');
     finishSession('ok');
@@ -51,7 +64,7 @@ test('finishSession uses the same badge style as regular status lines', async ()
 
   const output = stripAnsi(stdout);
 
-  assert.match(output, /\[\+\] prepare finished in /);
+  assert.match(output, /\[\+\] prepare-workspace finished in /);
   assert.match(output, /1 ok \| 1 skipped \| 0 failed/);
 });
 
